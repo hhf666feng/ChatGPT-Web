@@ -2,7 +2,7 @@ import express from 'express'
 import type { ChatContext, ChatMessage } from './chatgpt'
 import { chatConfig, chatReply, chatReplyProcess, code2Session } from './chatgpt'
 import db from './utils/database'
-import { addChatLogs, getOrcreateUser, getUser } from './users'
+import { getOrcreateUser, getUser } from './users'
 
 const app = express()
 const router = express.Router()
@@ -23,13 +23,13 @@ router.post('/chat', async (req, res) => {
     // 若不存在则创建用户
     await getOrcreateUser(openid)
     const response = await chatReply(prompt, options)
-    if (response.status === 'Success') {
-      const usage = response.data.detail.usage
-      const total_tokens = usage.total_tokens
-      const completion_tokens = usage.completion_tokens
-      const prompt_tokens = usage.prompt_tokens
-      await addChatLogs({ openid, prompt, power: 0, total_tokens, completion_tokens, prompt_tokens })
-    }
+    // if (response.status === 'Success') {
+    //   const usage = response.data.detail.usage
+    //   const total_tokens = usage.total_tokens
+    //   const completion_tokens = usage.completion_tokens
+    //   const prompt_tokens = usage.prompt_tokens
+    //   await addChatLogs({ openid, prompt, power: 0, total_tokens, completion_tokens, prompt_tokens })
+    // }
     res.send(response)
   }
   catch (error) {
