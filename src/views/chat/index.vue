@@ -340,9 +340,10 @@ const footerClass = computed(() => {
 onMounted(() => {
   scrollToBottom()
 })
-
+// 注册滚动事件
 onUnmounted(() => {
   if (loading.value)
+  // 作用域销毁时，取消请求
     controller.abort()
 })
 </script>
@@ -402,15 +403,43 @@ onUnmounted(() => {
             type="textarea"
             :autosize="{ minRows: 1, maxRows: 2 }"
             :placeholder="placeholder"
-            @keypress="handleEnter"
+            :disabled="loading"
+            @keydown.enter="handleEnter"
           />
-          <NButton type="primary" :disabled="buttonDisabled" @click="handleSubmit">
-            <template #icon>
-              <span class="dark:text-black">
-                <SvgIcon icon="ri:send-plane-fill" />
+          <HoverButton :disabled="buttonDisabled" @click="handleSubmit">
+            <span class="text-xl text-[#4f555e] dark:text-white">
+              <SvgIcon icon="ri:send-plane-2-line" />
+            </span>
+          </HoverButton>
+          <div class="relative flex-1 overflow-hidden break-all text-ellipsis whitespace-nowrap">
+            <span>充当英语翻译和改进者</span>
+          </div>
+          <div class="relative flex-1 overflow-hidden break-all text-ellipsis whitespace-nowrap">
+            <span>充当 Linux 终端</span>
+          </div>
+        </div>
+        <div class="w-full max-w-screen-xl m-auto">
+          <div class="flex items-center justify-between space-x-2">
+            <HoverButton @click="handleClear">
+              <span class="text-xl text-[#4f555e] dark:text-white">
+                <SvgIcon icon="ri:delete-bin-line" />
               </span>
-            </template>
-          </NButton>
+            </HoverButton>
+            <NInput
+              v-model:value="prompt"
+              type="textarea"
+              :autosize="{ minRows: 1, maxRows: 2 }"
+              :placeholder="placeholder"
+              @keypress="handleEnter"
+            />
+            <NButton type="primary" :disabled="buttonDisabled" @click="handleSubmit">
+              <template #icon>
+                <span class="dark:text-black">
+                  <SvgIcon icon="ri:send-plane-fill" />
+                </span>
+              </template>
+            </NButton>
+          </div>
         </div>
       </div>
     </footer>

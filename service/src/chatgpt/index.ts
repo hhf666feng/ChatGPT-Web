@@ -4,6 +4,7 @@ import type { ChatGPTAPIOptions, ChatMessage, SendMessageOptions } from 'chatgpt
 import { ChatGPTAPI, ChatGPTUnofficialProxyAPI } from 'chatgpt'
 import { SocksProxyAgent } from 'socks-proxy-agent'
 import fetch from 'node-fetch'
+import axios from 'axios'
 import { sendResponse } from '../utils'
 import type { ApiModel, ChatContext, ChatGPTUnofficialProxyAPIOptions, ModelConfig } from '../types'
 
@@ -129,6 +130,31 @@ async function chatConfig() {
   })
 }
 
+// 定义接口返回的数据类型
+interface Code2SessionResponse {
+  openid: string
+  session_key: string
+  unionid?: string
+  errcode?: number
+  errmsg?: string
+}
+
+// 定义一个函数，传入 code 参数，返回一个 Promise 对象
+async function code2Session(code: string) {
+  // 定义微信开放平台的 appid 和 secret
+  const appid = 'wx2cb62f688bb5d39c'
+  const secret = 'e64edac57f78605445d2b38be2483e49'
+
+  // 定义请求的 url
+  const url = `https://api.weixin.qq.com/sns/jscode2session?appid=${appid}&secret=${secret}&js_code=${code}&grant_type=authorization_code`
+  const response = await axios.get<Code2SessionResponse>(url)
+  const data = response.data
+  if (data.errcode)
+    return sendResponse({ type: 'Fail', message: '登录失败' })
+  // 返回一个 Promise 对象
+  return sendResponse({ type: 'Success', message: '登录成功', data })
+}
+
 export type { ChatContext, ChatMessage }
 
-export { chatReply, chatReplyProcess, chatConfig }
+export { chatReply, chatReplyProcess, chatConfig, code2Session }
