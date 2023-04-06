@@ -2,7 +2,6 @@ import console from 'console'
 import express from 'express'
 import type { ChatContext, ChatMessage } from './chatgpt'
 import { chatConfig, chatReply, chatReplyProcess, code2Session } from './chatgpt'
-import db from './utils/database'
 
 const app = express()
 const router = express.Router()
@@ -101,23 +100,23 @@ router.get('/login', async (req, res) => {
 //   }
 // })
 
-router.get('/sub-power', async (req, res) => {
-  try {
-    const { openid, power } = req.body as { openid: string; power: number }
-    if (!openid)
-      throw new Error('OpenID is empty')
-    const sql = 'UPDATE powers SET power = power - ? WHERE openid = ? AND power >= 0'
+// router.get('/sub-power', async (req, res) => {
+//   try {
+//     const { openid, power } = req.body as { openid: string; power: number }
+//     if (!openid)
+//       throw new Error('OpenID is empty')
+//     const sql = 'UPDATE powers SET power = power - ? WHERE openid = ? AND power >= 0'
 
-    db.query(sql, [power, openid], (err, data) => {
-      if (err)
-        throw err
-      res.send({ status: 'Success', data })
-    })
-  }
-  catch (error) {
-    res.send(error)
-  }
-})
+//     db.query(sql, [power, openid], (err, data) => {
+//       if (err)
+//         throw err
+//       res.send({ status: 'Success', data })
+//     })
+//   }
+//   catch (error) {
+//     res.send(error)
+//   }
+// })
 
 app.use('', router)
 app.use('/api', router)
