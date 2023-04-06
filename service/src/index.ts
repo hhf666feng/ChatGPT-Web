@@ -3,7 +3,6 @@ import express from 'express'
 import type { ChatContext, ChatMessage } from './chatgpt'
 import { chatConfig, chatReply, chatReplyProcess, code2Session } from './chatgpt'
 import db from './utils/database'
-import { getOrcreateUser, getUser } from './users'
 
 const app = express()
 const router = express.Router()
@@ -22,7 +21,7 @@ router.post('/chat', async (req, res) => {
   try {
     const { prompt, options = {}, openid } = req.body as { prompt: string; options?: ChatContext;openid: string }
     // 若不存在则创建用户
-    getOrcreateUser(openid)
+    // getOrcreateUser(openid)
     const response = await chatReply(prompt, options)
     if (response.status === 'Success') {
       const usage = response.data.detail.usage
@@ -31,6 +30,9 @@ router.post('/chat', async (req, res) => {
       const prompt_tokens = usage.prompt_tokens
       // addChatLogs({ openid, prompt, power: 0, total_tokens, completion_tokens, prompt_tokens })
       console.log('addChatLogs', { openid, prompt, power: 0, total_tokens, completion_tokens, prompt_tokens })
+    }
+    else {
+      console.log('addChatLogs-fail', { openid, prompt, power: 0, total_tokens: 0, completion_tokens: 0, prompt_tokens: 0 })
     }
     res.send(response)
   }
@@ -79,25 +81,25 @@ router.get('/login', async (req, res) => {
   }
 })
 
-router.get('/power', async (req, res) => {
-  try {
-    const openid = <string>req.query.openid ?? ''
-    if (!openid)
-      throw new Error('OpenID is empty')
+// router.get('/power', async (req, res) => {
+//   try {
+//     const openid = <string>req.query.openid ?? ''
+//     if (!openid)
+//       throw new Error('OpenID is empty')
 
-    res.send(getUser(openid))
-    const sql = 'SELECT * FROM powers WHERE openid = ?'
+//     res.send(getUser(openid))
+//     const sql = 'SELECT * FROM powers WHERE openid = ?'
 
-    db.query(sql, [openid], (err, data) => {
-      if (err)
-        throw err
-      res.send({ status: 'Success', data: data[0].power })
-    })
-  }
-  catch (error) {
-    res.send(error)
-  }
-})
+//     db.query(sql, [openid], (err, data) => {
+//       if (err)
+//         throw err
+//       res.send({ status: 'Success', data: data[0].power })
+//     })
+//   }
+//   catch (error) {
+//     res.send(error)
+//   }
+// })
 
 router.get('/sub-power', async (req, res) => {
   try {
